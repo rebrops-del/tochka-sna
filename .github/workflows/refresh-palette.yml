@@ -14,40 +14,38 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Update palette
+      - name: Update palette and firmness layout
         shell: python
         run: |
           from pathlib import Path
           p = Path('index.html')
           t = p.read_text(encoding='utf-8')
-          replacements = {
-            ':root{--ink:#263832;--mut:#6b7c75;--line:#dce8e2;--bg:#f6f8f6;--forest:#294f40;--green:#527f6d;--green2:#74a08c;--sage:#b9d0c4;--mint:#eef6f2;--soft:#fbfcfb;--accent:#2f6fa3;--accent2:#255b86;--accentSoft:#edf5fb;--price:#b6782f;--priceSoft:#fff6e7;--gold:#c89a4b;--shadow:0 16px 42px rgba(41,79,64,.10)}': ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f4fff7;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#f2b705;--priceDark:#9a7000;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.13)}',
-            '<meta name="theme-color" content="#527f6d">': '<meta name="theme-color" content="#20bd66">',
-            '.top{background:#244b3d;color:#e4f0ea': '.top{background:#08783f;color:#effff5',
-            '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#315c4b,#7aa48f);': '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#0ca94f,#43d77f);',
-            '.brandmark:after{content:"";position:absolute;width:12px;height:3px;background:var(--gold);': '.brandmark:after{content:"";position:absolute;width:12px;height:3px;background:#fff34f;',
-            '.brandtext span{color:var(--green2)}': '.brandtext span{color:var(--green)}',
-            '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;box-shadow:0 10px 24px rgba(47,111,163,.22);transition:.2s}': '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--avito),var(--avito2));color:#fff;border:0;box-shadow:0 10px 24px rgba(0,170,255,.27);transition:.2s}',
-            '.hero{background:radial-gradient(circle at 85% 18%,rgba(185,208,196,.28),transparent 32%),linear-gradient(135deg,#315a49,#527f6d 68%,#6f9a85);': '.hero{background:radial-gradient(circle at 84% 15%,rgba(154,255,190,.30),transparent 31%),linear-gradient(135deg,#078b47,#19b95f 58%,#47d983);',
-            '.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}': '.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#fff34f}',
-            '.deliverybox{background:linear-gradient(135deg,#345e4e,#5a8873);': '.deliverybox{background:linear-gradient(135deg,#0a994d,#2ccc72);',
-            '.network{background:var(--mint)}': '.network{background:#edfff3}',
-            '.fact{background:var(--mint);border:1px solid #d9e9de': '.fact{background:#effff4;border:1px solid #ccefd8',
-            '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--mint);color:var(--forest);': '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#ddffea;color:#0b9f4e;',
-            '.selecttable th{background:#eaf4ed;color:var(--forest);': '.selecttable th{background:#ddffea;color:#08783f;',
-            'input:focus,select:focus{outline:none;border-color:#8fb4a2;box-shadow:0 0 0 3px rgba(82,127,109,.11)}': 'input:focus,select:focus{outline:none;border-color:#43d77f;box-shadow:0 0 0 3px rgba(32,189,102,.14)}',
-            '.tag{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--green);height:15px;line-height:15px}': '.tag{display:inline-flex;align-items:center;align-self:flex-start;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#08783f;background:#ddffea;border:1px solid #b9efcd;border-radius:999px;min-height:24px;line-height:1;padding:5px 9px}.tag.hit{color:#fff;background:var(--hit);border-color:var(--hit);box-shadow:0 5px 12px rgba(239,51,64,.20)}',
-            '.firmness{background:#f1f6f2;border:1px solid #d6e6da': '.firmness{background:#edfff3;border:1px solid #ccefd8',
-            '.spec summary:after{content:"+";margin-left:auto;font-size:18px;font-weight:700;color:var(--accent)}': '.spec summary:after{content:"+";margin-left:auto;font-size:18px;font-weight:700;color:var(--green)}',
-            '.price{height:39px;line-height:39px;font-size:29px;font-weight:900;color:var(--price)}': '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:0 1px 0 rgba(154,112,0,.18)}',
-            '.cta{background:linear-gradient(135deg,#315848,#4f7b67);': '.cta{background:linear-gradient(135deg,#078b47,#22c76a);',
-            '.footer{background:#223f35': '.footer{background:#076b39',
-            '<div class="tag">${safe(x.category)}</div>': '<div class="tag ${/хит/i.test(x.category)?\'hit\':\'\'}">${safe(x.category)}</div>'
-          }
-          for old, new in replacements.items():
-              t = t.replace(old, new)
+          t = t.replace(
+              ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f4fff7;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#f2b705;--priceDark:#9a7000;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.13)}',
+              ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f7fcf8;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#e6323d;--priceDark:#b71f2b;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.11)}'
+          )
+          t = t.replace(
+              '.hero{background:radial-gradient(circle at 84% 15%,rgba(154,255,190,.30),transparent 31%),linear-gradient(135deg,#078b47,#19b95f 58%,#47d983);',
+              '.hero{background:radial-gradient(circle at 84% 15%,rgba(206,244,220,.24),transparent 31%),linear-gradient(135deg,#2f9967,#45b77b 58%,#72cc9c);'
+          )
+          t = t.replace(
+              '.deliverybox{background:linear-gradient(135deg,#0a994d,#2ccc72);',
+              '.deliverybox{background:linear-gradient(135deg,#2f9868,#58b985);'
+          )
+          t = t.replace(
+              '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:0 1px 0 rgba(154,112,0,.18)}',
+              '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:none}'
+          )
+          t = t.replace(
+              '.firmness{background:#edfff3;border:1px solid #ccefd8;border-radius:14px;padding:11px 13px;color:#365a4a;font-size:13px;line-height:1.35;min-height:58px;display:flex;align-items:center}.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}',
+              '.firmness{background:#edfff3;border:1px solid #ccefd8;border-radius:14px;padding:11px 13px;color:#365a4a;font-size:13px;line-height:1.35;min-height:58px;display:flex;align-items:flex-start}.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}.firmness span{display:block}'
+          )
+          t = t.replace(
+              '''<div class="firmness"><b>Жёсткость:</b> ${safe(firm)}</div>''',
+              '''<div class="firmness"><b>Жёсткость:</b><span>${safe(firm).replace(' / 2 сторона','<br>2 сторона')}</span></div>'''
+          )
           p.write_text(t, encoding='utf-8')
-      - name: Commit palette update
+      - name: Commit site update
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -55,6 +53,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes needed"
           else
-            git commit -m "Use bright green palette, red hits, yellow prices and Avito blue buttons"
+            git commit -m "Use red prices, softer green backgrounds and stacked firmness lines"
             git push
           fi

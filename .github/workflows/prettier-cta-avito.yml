@@ -44,3 +44,4 @@ jobs:
           git add index.html .github/workflows/prettier-cta-avito.yml
           git commit -m 'Polish lower Avito CTA button'
           git push
+# trigger

@@ -1,9 +1,8 @@
-name: Apply agreed consultant hero
+name: Use product photo rows
 
 on:
   push:
-    paths:
-      - '.github/workflows/use-photo-rows.yml'
+    branches: [main]
 
 permissions:
   contents: write
@@ -14,21 +13,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Apply hero change
-        run: python scripts/apply-agreed-hero.py
-      - name: Verify hero and HTML sections
+      - name: Switch catalog cards to row assets
+        shell: bash
         run: |
-          grep -q 'class="hero-visual"' index.html
-          grep -q 'assets/hero-consultant-mattress.webp' index.html
-          grep -q '<section class="section delivery" id="delivery">' index.html
-          grep -q '<section class="section catalog" id="catalog">' index.html
-          test -s assets/hero-consultant-mattress.webp
-      - name: Commit hero change
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="background-image:url('assets/product-sprite.webp?v=20260905-photos');background-repeat:no-repeat;background-size:500% 500%;background-position:calc(var(--col) * 25%) calc(var(--row) * 25%);background-color:#fff"
+          new="background-repeat:no-repeat;background-size:500% 100%;background-position:calc(var(--col) * 25%) 0;background-color:#fff"
+          if old in s:
+              s=s.replace(old,new)
+          old_style='style="--col:${pp[0]};--row:${pp[1]}"'
+          new_style='style="--col:${pp[0]};background-image:url(\'assets/product-row-${pp[1]+1}.webp?v=20260905-photos2\')"'
+          if old_style in s:
+              s=s.replace(old_style,new_style)
+          if 'product-row-${pp[1]+1}.webp' not in s:
+              raise SystemExit('Photo row card marker not installed')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify assets
         run: |
+          test -s assets/product-row-1.webp
+          test -s assets/product-row-2.webp
+          test -s assets/product-row-3.webp
+          test -s assets/product-row-4.webp
+          test -s assets/product-row-5.webp
+          grep -q 'product-row-${pp\[1\]+1}.webp' index.html
+      - name: Commit row asset switch
+        run: |
+          if git diff --quiet; then
+            echo "No changes"
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Integrate consultant and mattress into live hero"
+          git commit -m "Use valid product photo row assets"
           git push

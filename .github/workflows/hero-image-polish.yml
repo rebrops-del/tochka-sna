@@ -1,0 +1,49 @@
+name: Polish hero image readability and corners
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hero-image-polish.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  polish:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Improve hero image styling
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='/* hero-image-polish-v1 */'
+          css='''\n\n/* hero-image-polish-v1 */
+.hero-visual{border-radius:28px;overflow:hidden;box-shadow:0 16px 40px rgba(25,58,45,.10)}
+.hero-visual img{border-radius:inherit}
+.hero-note{z-index:4;right:4.5%;top:5.5%;color:var(--brand-green);font-size:clamp(26px,2.2vw,35px);font-weight:700;line-height:1.18;letter-spacing:.01em;padding:8px 10px;isolation:isolate;text-shadow:-1px -1px 0 rgba(255,255,255,.96),1px -1px 0 rgba(255,255,255,.96),-1px 1px 0 rgba(255,255,255,.96),1px 1px 0 rgba(255,255,255,.96),0 2px 8px rgba(255,255,255,.98),0 4px 18px rgba(255,255,255,.92)}
+.hero-note:before{content:"";position:absolute;z-index:-1;inset:-12px -20px;background:radial-gradient(ellipse at center,rgba(255,255,255,.58) 0%,rgba(255,255,255,.34) 56%,rgba(255,255,255,0) 78%);border-radius:40px;pointer-events:none}
+.hero-note span{color:var(--brand-green)}
+@media(max-width:900px){.hero-visual{border-radius:24px}.hero-note{right:4%;top:5%;font-size:clamp(24px,5vw,33px)}}
+@media(max-width:620px){.hero-visual{border-radius:22px}.hero-note{right:3.5%;top:4.5%;font-size:clamp(23px,7vw,31px);padding:6px 8px}.hero-note:before{inset:-9px -14px}}
+'''
+          if marker not in s:
+              pos=s.rfind('</style>')
+              if pos < 0:
+                  raise SystemExit('style closing tag not found')
+              s=s[:pos]+css+s[pos:]
+              p.write_text(s,encoding='utf-8')
+          PY
+          rm -f .github/workflows/hero-image-polish.yml
+      - name: Commit hero polish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/hero-image-polish.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Improve hero text readability and round image corners'
+          git push

@@ -29,6 +29,15 @@ jobs:
           if '.product-photo{' not in s:
               s = s.replace('</style>', css + '\n</style>')
 
+          cta_marker = '/* cta-avito-brand-fix-v1 */'
+          cta_css = '''
+          /* cta-avito-brand-fix-v1 */
+          .cta .btn.avito{background:#fff!important;color:var(--brand-green)!important;border:2px solid #fff!important;box-shadow:none!important}
+          .cta .btn.avito:hover{background:#EFF8F4!important;color:var(--brand-green)!important;border-color:#EFF8F4!important;filter:none}
+          '''
+          if cta_marker not in s:
+              s = s.replace('</style>', cta_css + '\n</style>', 1)
+
           photo_map = '''const PHOTO_POS={
           'Матрас Imperial Suite кокос Gray Night':[0,0],
           'Матрас Imperial Suite латекс-кокос Gray Night':[1,0],
@@ -76,8 +85,9 @@ jobs:
           grep -q "const PHOTO_POS" index.html
           grep -q "product-photo" index.html
           grep -q '${photo}<div class="body">' index.html
+          grep -q "cta-avito-brand-fix-v1" index.html
 
-      - name: Commit catalog photos
+      - name: Commit catalog photos and CTA styling
         run: |
           if git diff --quiet; then
             echo "No changes"
@@ -86,5 +96,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Show photos in all catalog cards"
+          git commit -m "Use brand styling for CTA Avito button"
           git push

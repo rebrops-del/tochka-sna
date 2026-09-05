@@ -18,6 +18,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
@@ -30,12 +31,15 @@ jobs:
               s = s.replace('</style>', css + '\n</style>')
 
           cta_marker = '/* cta-avito-brand-fix-v1 */'
-          cta_css = '''
-          /* cta-avito-brand-fix-v1 */
-          .cta .btn.avito{background:#fff!important;color:var(--brand-green)!important;border:2px solid #fff!important;box-shadow:none!important}
-          .cta .btn.avito:hover{background:#EFF8F4!important;color:var(--brand-green)!important;border-color:#EFF8F4!important;filter:none}
-          '''
-          if cta_marker not in s:
+          cta_css = '''/* cta-avito-brand-fix-v1 */
+.cta .btn.avito{background:#fff!important;color:var(--brand-green)!important;border:1.5px solid var(--brand-green)!important;border-radius:999px!important;box-shadow:none!important;gap:13px!important;font-weight:900!important;filter:none!important;min-height:54px;padding:0 20px}
+.cta .btn.avito::after{content:"";display:block;flex:0 0 18px;width:18px;height:18px;background:radial-gradient(circle at 4px 4px,#00aaff 0 3.8px,transparent 4.1px),radial-gradient(circle at 14px 4px,#ff4053 0 3.8px,transparent 4.1px),radial-gradient(circle at 4px 14px,#965eeb 0 3.8px,transparent 4.1px),radial-gradient(circle at 14px 14px,#04e061 0 3.8px,transparent 4.1px)}
+.cta .btn.avito:hover{background:#F5FBF8!important;color:var(--brand-green)!important;border-color:var(--brand-green)!important;box-shadow:0 8px 20px rgba(10,141,85,.10)!important;filter:none!important}
+'''
+          pattern = r'/\* cta-avito-brand-fix-v1 \*/\s*\.cta \.btn\.avito\{.*?\}\s*\.cta \.btn\.avito:hover\{.*?\}\s*'
+          if re.search(pattern, s, flags=re.S):
+              s = re.sub(pattern, cta_css, s, count=1, flags=re.S)
+          elif cta_marker not in s:
               s = s.replace('</style>', cta_css + '\n</style>', 1)
 
           photo_map = '''const PHOTO_POS={
@@ -86,6 +90,7 @@ jobs:
           grep -q "product-photo" index.html
           grep -q '${photo}<div class="body">' index.html
           grep -q "cta-avito-brand-fix-v1" index.html
+          grep -q "cta .btn.avito::after" index.html
 
       - name: Commit catalog photos and CTA styling
         run: |
@@ -96,5 +101,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Use brand styling for CTA Avito button"
+          git commit -m "Match lower Avito CTA to catalog card buttons"
           git push

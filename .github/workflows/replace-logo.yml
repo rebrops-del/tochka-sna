@@ -1,0 +1,41 @@
+name: Replace header logo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/replace-logo.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  replace-logo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Replace logo in header
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='<a class="brand" href="#top"><span class="brandmark"></span><span class="brandtext">Точка <span>Сна</span><small>Онлайн-сеть по России</small></span></a>'
+          new='<a class="brand brand-logo" href="#top" aria-label="Точка Сна"><img src="assets/logo-tochka-sna.svg?v=20260905-logo1" alt="Точка Сна — матрасы для комфортной жизни" width="250" height="50"></a>'
+          if old not in s:
+              raise SystemExit('Current brand markup not found; index.html left unchanged')
+          s=s.replace(old,new,1)
+          css='''\n/* approved-logo-v1 */\n.brand.brand-logo{display:flex;align-items:center;flex:0 0 auto;text-decoration:none}\n.brand-logo img{display:block;width:250px;height:auto;max-width:100%}\n@media(max-width:760px){.brand-logo img{width:210px}}\n@media(max-width:520px){.brand-logo img{width:185px}}\n'''
+          s=s.replace('</style>',css+'\n</style>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          rm -f .github/workflows/replace-logo.yml
+      - name: Commit change
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/replace-logo.yml
+          git commit -m 'Use approved Tochka Sna logo'
+          git push

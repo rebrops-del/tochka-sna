@@ -51,3 +51,5 @@ jobs:
           git add index.html .github/workflows/fix-cta-avito.yml
           git commit -m "Use brand styling for CTA Avito button"
           git push
+
+# trigger

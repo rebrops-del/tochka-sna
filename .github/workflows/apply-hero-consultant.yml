@@ -1,0 +1,70 @@
+name: Apply consultant hero
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-hero-consultant.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Integrate hero image without touching catalog
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          hero_css = '''.hero{background:linear-gradient(110deg,#f7fbf9 0%,#eef8f3 55%,#eaf5ef 100%);color:var(--ink);overflow:hidden;border-bottom:1px solid #dceae2}.hero .wrap{padding:48px 0 46px;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(390px,.94fr);gap:34px;align-items:center}.hero-copy{min-width:0}.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#e4f5eb;border:1px solid #cbe8d8;color:#15724f;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;margin-bottom:18px}.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#31b875}.hero h1{font-size:clamp(38px,4.6vw,60px);letter-spacing:-.04em;line-height:1.02;margin:0 0 18px;max-width:660px;color:#123d31}.hero p{font-size:17px;line-height:1.65;color:#536d61;max-width:650px;margin:0 0 24px}.hero .btn.light{background:linear-gradient(135deg,#176b4c,#2d8f68);color:#fff;border:0;box-shadow:0 10px 24px rgba(23,107,76,.20)}.actions{display:flex;gap:12px;flex-wrap:wrap}.advantages{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:30px}.adv{padding:16px;border-radius:18px;background:#fff;border:1px solid #d8e8df;box-shadow:0 8px 24px rgba(31,79,60,.05)}.adv strong{display:block;font-size:16px;margin-bottom:6px;color:#174b38}.adv span{font-size:13px;line-height:1.45;color:#657970}.hero-visual{width:100%;aspect-ratio:1.06/1;border-radius:28px;overflow:hidden;background:#fff;box-shadow:0 22px 54px rgba(24,75,59,.15);border:1px solid #d8e8df}.hero-visual img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+'''
+
+          css_pattern = re.compile(r'\.hero\{.*?\.adv span\{[^}]*\}\n(?=\.section\{padding:50px 0\})', re.S)
+          s, n_css = css_pattern.subn(hero_css, s, count=1)
+          if n_css != 1:
+              raise SystemExit(f'Hero CSS block not found exactly once: {n_css}')
+
+          hero_html = '''<header class="hero" id="top"><div class="wrap"><div class="hero-copy"><div class="eyebrow">Екатеринбургский филиал федеральной онлайн-сети</div><h1>Комфортный сон начинается с правильного матраса</h1><p>«Точка Сна» работает в онлайн-формате: консультация и подбор — дистанционно, заказ оформляется через Avito. Екатеринбургский филиал обслуживает город и ближайшие районы, региональный склад расположен в г. Берёзовский.</p><div class="actions"><a class="btn light" href="#catalog">Смотреть каталог</a><a class="btn avito" target="_blank" rel="noopener">Получить консультацию в Avito</a></div><div class="advantages"><div class="adv"><strong>Подбор по параметрам</strong><span>Учитываем вес, позу сна, желаемую жёсткость и бюджет.</span></div><div class="adv"><strong>Сравнение конструкций</strong><span>Поможем разобраться в беспружинных моделях, TFK и MultiPocket.</span></div><div class="adv"><strong>Сужаем выбор</strong><span>Вместо десятков вариантов предложим 2–3 модели под ваш запрос.</span></div></div></div><div class="hero-visual"><img src="assets/hero-consultant-mattress.webp?v=20260905-hero1" alt="Консультант Точка Сна рядом с матрасом" width="900" height="847"></div></div></header>'''
+          header_pattern = re.compile(r'<header class="hero" id="top">.*?</header>', re.S)
+          s, n_header = header_pattern.subn(hero_html, s, count=1)
+          if n_header != 1:
+              raise SystemExit(f'Hero HTML not found exactly once: {n_header}')
+
+          marker1000 = '@media(max-width:1000px){'
+          responsive1000 = '@media(max-width:1000px){.hero .wrap{grid-template-columns:minmax(0,1fr) minmax(310px,.8fr);gap:24px}.hero .advantages{grid-template-columns:1fr 1fr}'
+          if marker1000 not in s:
+              raise SystemExit('1000px media marker not found')
+          s = s.replace(marker1000, responsive1000, 1)
+
+          marker620 = '@media(max-width:620px){'
+          responsive760 = '@media(max-width:760px){.hero .wrap{grid-template-columns:1fr;gap:24px;padding:40px 0}.hero-copy{order:1}.hero-visual{order:2;min-height:400px;aspect-ratio:1.12/1;border-radius:22px}.hero .advantages{grid-template-columns:1fr 1fr}}\n@media(max-width:620px){'
+          if marker620 not in s:
+              raise SystemExit('620px media marker not found')
+          s = s.replace(marker620, responsive760, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit hero integration
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Integrate consultant and mattress into hero"
+          git push

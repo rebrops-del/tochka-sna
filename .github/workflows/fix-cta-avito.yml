@@ -1,0 +1,53 @@
+name: Fix CTA Avito button color
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove blue CTA button styling
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '/* cta-avito-brand-fix-v1 */'
+          css = '''
+/* cta-avito-brand-fix-v1 */
+.cta .btn.avito{
+  background:#fff!important;
+  color:var(--brand-green)!important;
+  border:2px solid #fff!important;
+  box-shadow:none!important;
+}
+.cta .btn.avito:hover{
+  background:#EFF8F4!important;
+  color:var(--brand-green)!important;
+  border-color:#EFF8F4!important;
+  filter:none;
+}
+'''
+          if marker not in s:
+              s = s.replace('</style>', css + '\n</style>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit fix and remove one-time workflow
+        shell: bash
+        run: |
+          rm .github/workflows/fix-cta-avito.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/fix-cta-avito.yml
+          git commit -m "Use brand styling for CTA Avito button"
+          git push

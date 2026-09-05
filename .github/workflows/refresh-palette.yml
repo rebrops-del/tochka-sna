@@ -21,21 +21,28 @@ jobs:
           p = Path('index.html')
           t = p.read_text(encoding='utf-8')
           replacements = {
-            ':root{--ink:#24352f;--mut:#6b7a73;--line:#dce7e0;--bg:#f5f7f5;--forest:#1d4b3c;--green:#3d725d;--green2:#5b8a75;--sage:#a6c4b4;--mint:#edf5f0;--soft:#fafbf9;--accent:#c97843;--accent2:#a95a31;--accentSoft:#fbefe7;--gold:#d6a45a;--shadow:0 16px 42px rgba(31,79,60,.10)}': ':root{--ink:#263832;--mut:#6b7c75;--line:#dce8e2;--bg:#f6f8f6;--forest:#294f40;--green:#527f6d;--green2:#74a08c;--sage:#b9d0c4;--mint:#eef6f2;--soft:#fbfcfb;--accent:#2f6fa3;--accent2:#255b86;--accentSoft:#edf5fb;--price:#b6782f;--priceSoft:#fff6e7;--gold:#c89a4b;--shadow:0 16px 42px rgba(41,79,64,.10)}',
-            '.top{background:#123d30;color:#dcece3': '.top{background:#244b3d;color:#e4f0ea',
-            '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,var(--forest),var(--green2));': '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#315c4b,#7aa48f);',
-            '.brandtext span{color:var(--accent)}': '.brandtext span{color:var(--green2)}',
-            '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;box-shadow:0 10px 24px rgba(169,90,49,.22);transition:.2s}': '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;box-shadow:0 10px 24px rgba(47,111,163,.22);transition:.2s}',
-            '.hero{background:radial-gradient(circle at 85% 20%,rgba(145,188,162,.24),transparent 30%),linear-gradient(135deg,#143f32,#1e5c46 68%,#2c7658);': '.hero{background:radial-gradient(circle at 85% 18%,rgba(185,208,196,.28),transparent 32%),linear-gradient(135deg,#315a49,#527f6d 68%,#6f9a85);',
-            '.deliverybox{background:linear-gradient(135deg,#173f33,#2d7358);': '.deliverybox{background:linear-gradient(135deg,#345e4e,#5a8873);',
-            '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--accentSoft);color:var(--accent2);': '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--mint);color:var(--forest);',
-            'input:focus,select:focus{outline:none;border-color:#d6a982;box-shadow:0 0 0 3px rgba(201,120,67,.10)}': 'input:focus,select:focus{outline:none;border-color:#8fb4a2;box-shadow:0 0 0 3px rgba(82,127,109,.11)}',
-            '.filterhint strong{color:var(--accent2)}': '.filterhint strong{color:var(--forest)}',
-            '.tag{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);': '.tag{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--green);',
-            '.price{height:39px;line-height:39px;font-size:29px;font-weight:900;color:var(--accent2)}': '.price{height:39px;line-height:39px;font-size:29px;font-weight:900;color:var(--price)}',
-            '.cta{background:linear-gradient(135deg,#173f33,#285f4a);': '.cta{background:linear-gradient(135deg,#315848,#4f7b67);',
-            '.footer{background:#102f26': '.footer{background:#223f35',
-            '<meta name="theme-color" content="#184b3b">': '<meta name="theme-color" content="#527f6d">'
+            ':root{--ink:#263832;--mut:#6b7c75;--line:#dce8e2;--bg:#f6f8f6;--forest:#294f40;--green:#527f6d;--green2:#74a08c;--sage:#b9d0c4;--mint:#eef6f2;--soft:#fbfcfb;--accent:#2f6fa3;--accent2:#255b86;--accentSoft:#edf5fb;--price:#b6782f;--priceSoft:#fff6e7;--gold:#c89a4b;--shadow:0 16px 42px rgba(41,79,64,.10)}': ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f4fff7;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#f2b705;--priceDark:#9a7000;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.13)}',
+            '<meta name="theme-color" content="#527f6d">': '<meta name="theme-color" content="#20bd66">',
+            '.top{background:#244b3d;color:#e4f0ea': '.top{background:#08783f;color:#effff5',
+            '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#315c4b,#7aa48f);': '.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#0ca94f,#43d77f);',
+            '.brandmark:after{content:"";position:absolute;width:12px;height:3px;background:var(--gold);': '.brandmark:after{content:"";position:absolute;width:12px;height:3px;background:#fff34f;',
+            '.brandtext span{color:var(--green2)}': '.brandtext span{color:var(--green)}',
+            '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;box-shadow:0 10px 24px rgba(47,111,163,.22);transition:.2s}': '.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 19px;border-radius:13px;text-decoration:none;font-weight:900;background:linear-gradient(135deg,var(--avito),var(--avito2));color:#fff;border:0;box-shadow:0 10px 24px rgba(0,170,255,.27);transition:.2s}',
+            '.hero{background:radial-gradient(circle at 85% 18%,rgba(185,208,196,.28),transparent 32%),linear-gradient(135deg,#315a49,#527f6d 68%,#6f9a85);': '.hero{background:radial-gradient(circle at 84% 15%,rgba(154,255,190,.30),transparent 31%),linear-gradient(135deg,#078b47,#19b95f 58%,#47d983);',
+            '.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}': '.eyebrow:before{content:"";width:8px;height:8px;border-radius:50%;background:#fff34f}',
+            '.deliverybox{background:linear-gradient(135deg,#345e4e,#5a8873);': '.deliverybox{background:linear-gradient(135deg,#0a994d,#2ccc72);',
+            '.network{background:var(--mint)}': '.network{background:#edfff3}',
+            '.fact{background:var(--mint);border:1px solid #d9e9de': '.fact{background:#effff4;border:1px solid #ccefd8',
+            '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:var(--mint);color:var(--forest);': '.step i{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#ddffea;color:#0b9f4e;',
+            '.selecttable th{background:#eaf4ed;color:var(--forest);': '.selecttable th{background:#ddffea;color:#08783f;',
+            'input:focus,select:focus{outline:none;border-color:#8fb4a2;box-shadow:0 0 0 3px rgba(82,127,109,.11)}': 'input:focus,select:focus{outline:none;border-color:#43d77f;box-shadow:0 0 0 3px rgba(32,189,102,.14)}',
+            '.tag{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--green);height:15px;line-height:15px}': '.tag{display:inline-flex;align-items:center;align-self:flex-start;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#08783f;background:#ddffea;border:1px solid #b9efcd;border-radius:999px;min-height:24px;line-height:1;padding:5px 9px}.tag.hit{color:#fff;background:var(--hit);border-color:var(--hit);box-shadow:0 5px 12px rgba(239,51,64,.20)}',
+            '.firmness{background:#f1f6f2;border:1px solid #d6e6da': '.firmness{background:#edfff3;border:1px solid #ccefd8',
+            '.spec summary:after{content:"+";margin-left:auto;font-size:18px;font-weight:700;color:var(--accent)}': '.spec summary:after{content:"+";margin-left:auto;font-size:18px;font-weight:700;color:var(--green)}',
+            '.price{height:39px;line-height:39px;font-size:29px;font-weight:900;color:var(--price)}': '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:0 1px 0 rgba(154,112,0,.18)}',
+            '.cta{background:linear-gradient(135deg,#315848,#4f7b67);': '.cta{background:linear-gradient(135deg,#078b47,#22c76a);',
+            '.footer{background:#223f35': '.footer{background:#076b39',
+            '<div class="tag">${safe(x.category)}</div>': '<div class="tag ${/хит/i.test(x.category)?\'hit\':\'\'}">${safe(x.category)}</div>'
           }
           for old, new in replacements.items():
               t = t.replace(old, new)
@@ -48,6 +55,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes needed"
           else
-            git commit -m "Use softer green palette with blue Avito buttons and gold prices"
+            git commit -m "Use bright green palette, red hits, yellow prices and Avito blue buttons"
             git push
           fi

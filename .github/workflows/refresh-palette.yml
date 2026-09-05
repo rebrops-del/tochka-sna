@@ -14,37 +14,84 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Update palette and firmness layout
+      - name: Update site design and catalog presentation
         shell: python
         run: |
           from pathlib import Path
           p = Path('index.html')
           t = p.read_text(encoding='utf-8')
-          t = t.replace(
-              ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f4fff7;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#f2b705;--priceDark:#9a7000;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.13)}',
-              ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f7fcf8;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#e6323d;--priceDark:#b71f2b;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.11)}'
+
+          def rep(old, new, label):
+              global t
+              if old not in t:
+                  raise SystemExit(f'Missing expected fragment: {label}')
+              t = t.replace(old, new)
+
+          rep(
+              ':root{--ink:#173a2a;--mut:#60776b;--line:#d9eee1;--bg:#f7fcf8;--forest:#08783f;--green:#20bd66;--green2:#43d77f;--sage:#b9efcd;--mint:#eafff1;--soft:#fbfffc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#e6323d;--priceDark:#b71f2b;--hit:#ef3340;--shadow:0 16px 42px rgba(16,145,75,.11)}',
+              ':root{--ink:#193a2d;--mut:#64776e;--line:#dbe9e1;--bg:#f7faf8;--forest:#0d6545;--green:#31b875;--green2:#6bc997;--sage:#cfe8da;--mint:#eef8f3;--soft:#fbfdfc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#e5323d;--priceDark:#b71f2b;--hit:#ef3340;--promo:#f5c542;--shadow:0 16px 42px rgba(23,95,66,.10)}',
+              'root palette'
           )
-          t = t.replace(
-              '.hero{background:radial-gradient(circle at 84% 15%,rgba(154,255,190,.30),transparent 31%),linear-gradient(135deg,#078b47,#19b95f 58%,#47d983);',
-              '.hero{background:radial-gradient(circle at 84% 15%,rgba(206,244,220,.24),transparent 31%),linear-gradient(135deg,#2f9967,#45b77b 58%,#72cc9c);'
+          rep('.top{background:#08783f;color:#effff5;font-size:13px}', '.top{background:#104b37;color:#eef8f2;font-size:13px}', 'top strip')
+          rep('background:linear-gradient(145deg,#0ca94f,#43d77f)', 'background:linear-gradient(145deg,#1a8b5d,#65c592)', 'brand mark')
+          rep(
+              '.hero{background:radial-gradient(circle at 84% 15%,rgba(206,244,220,.24),transparent 31%),linear-gradient(135deg,#2f9967,#45b77b 58%,#72cc9c);',
+              '.hero{background:radial-gradient(circle at 84% 15%,rgba(235,249,241,.22),transparent 31%),linear-gradient(135deg,#318e68,#55ae80 58%,#82c9a6);',
+              'hero palette'
           )
-          t = t.replace(
-              '.deliverybox{background:linear-gradient(135deg,#0a994d,#2ccc72);',
-              '.deliverybox{background:linear-gradient(135deg,#2f9868,#58b985);'
+          rep(
+              '.section{padding:50px 0}.delivery{background:#fff}.deliverybox{background:linear-gradient(135deg,#2f9868,#58b985);color:#fff;border-radius:25px;padding:27px;box-shadow:var(--shadow)}.deliverybox h2{font-size:31px;margin:0 0 18px}.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.d{padding:17px;border-radius:17px;background:#ffffff14;border:1px solid #ffffff27}.d b{display:block;font-size:22px;margin:6px 0}.d small{color:#e0eee5;line-height:1.4}',
+              '.section{padding:50px 0}.delivery{background:#fff}.deliverybox{background:linear-gradient(135deg,#f3faf6,#e8f4ed);color:var(--ink);border:1px solid #d2e7db;border-radius:25px;padding:27px;box-shadow:var(--shadow)}.deliverybox h2{font-size:31px;margin:0 0 18px;color:var(--forest)}.dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.d{padding:17px;border-radius:17px;background:#fff;border:1px solid #d7e8de;box-shadow:0 8px 20px rgba(23,95,66,.05)}.d b{display:block;font-size:22px;margin:6px 0;color:#13754f}.d small{color:#667a70;line-height:1.4}',
+              'delivery palette'
           )
-          t = t.replace(
-              '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:0 1px 0 rgba(154,112,0,.18)}',
-              '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:none}'
+          rep('.network{background:#edfff3}', '.network{background:#f5f8f6}', 'network background')
+          rep('.fact{background:#effff4;border:1px solid #ccefd8', '.fact{background:#f4faf6;border:1px solid #d8e9df', 'network facts')
+          rep('.cta{background:linear-gradient(135deg,#078b47,#22c76a);', '.cta{background:linear-gradient(135deg,#176b4c,#2d8f68);', 'cta palette')
+          rep('.footer{background:#076b39', '.footer{background:#103f31', 'footer palette')
+
+          rep(
+              '.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}.firmness span{display:block}',
+              '.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}.firmness span{display:block}.firmness-placeholder{visibility:hidden}',
+              'firmness placeholder css'
           )
-          t = t.replace(
-              '.firmness{background:#edfff3;border:1px solid #ccefd8;border-radius:14px;padding:11px 13px;color:#365a4a;font-size:13px;line-height:1.35;min-height:58px;display:flex;align-items:center}.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}',
-              '.firmness{background:#edfff3;border:1px solid #ccefd8;border-radius:14px;padding:11px 13px;color:#365a4a;font-size:13px;line-height:1.35;min-height:58px;display:flex;align-items:flex-start}.firmness b{color:var(--forest);margin-right:5px;white-space:nowrap}.firmness span{display:block}'
+          rep(
+              '.price{height:42px;line-height:42px;font-size:31px;font-weight:950;color:var(--price);text-shadow:none}.body .btn{width:100%;height:46px;min-height:46px}',
+              '.pricearea{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:10px}.price{font-size:31px;line-height:1;font-weight:950;color:var(--price);text-shadow:none}.promo{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:0 0 auto}.promo b{font-size:11px;line-height:1;background:#fff5c9;color:#775800;border:1px solid #f0dc86;border-radius:999px;padding:6px 9px}.promo span{font-size:10px;color:#7d8b84;font-weight:700}.body .btn{width:100%;height:46px;min-height:46px}',
+              'price promo css'
           )
-          t = t.replace(
-              '''<div class="firmness"><b>Жёсткость:</b> ${safe(firm)}</div>''',
-              '''<div class="firmness"><b>Жёсткость:</b><span>${safe(firm).replace(' / 2 сторона','<br>2 сторона')}</span></div>'''
+
+          rep(
+              "const SIZE_FILTER_EXCLUDE=new Set(['Наматрасник \\\"Непромокаемый чехол\\\"','Подушка Память форма']);\nconst FIRMNESS={",
+              "const SIZE_FILTER_EXCLUDE=new Set(['Наматрасник \\\"Непромокаемый чехол\\\"','Подушка Память форма']);\nconst BESTSELLERS=new Set(['Матрас Mega холкон-кокос TFK Gray Night','Матрас Mega кокос 30 TFK','Матрас Imperial Suite холкон-кокос Gray Night','Матрас Барселона ZAСоня Gray Night']);\nconst NO_FIRMNESS=new Set(['Наматрасник \\\"Непромокаемый чехол\\\"']);\nconst FIRMNESS={",
+              'bestseller sets'
           )
+          rep("const FIRMNESS={\n'Матрас Стандарт':'Ниже средней',", "const FIRMNESS={\n'Подушка Память форма':'Средняя',\n'Матрас Стандарт':'Ниже средней',", 'pillow firmness')
+          rep(
+              "function getFirmness(x){if(FIRMNESS[x.model])return FIRMNESS[x.model];if(['Чехлы','Подушки'].includes(x.category))return 'Не применяется';",
+              "function getFirmness(x){if(FIRMNESS[x.model])return FIRMNESS[x.model];if(NO_FIRMNESS.has(x.model))return '';if(['Чехлы','Подушки'].includes(x.category))return 'Не применяется';",
+              'firmness function'
+          )
+          rep("const firm=getFirmness(x);return `", "const firm=getFirmness(x),hit=BESTSELLERS.has(x.model);const firmBlock=firm?`<div class=\"firmness\"><b>Жёсткость:</b><span>${safe(firm).replace(' / 2 сторона','<br>2 сторона')}</span></div>`:`<div class=\"firmness firmness-placeholder\" aria-hidden=\"true\"></div>`;return `", 'card variables')
+          rep("<div class=\"tag ${/хит/i.test(x.category)?'hit':''}\">${safe(x.category)}</div>", "<div class=\"tag ${hit?'hit':''}\">${hit?'Хит продаж':safe(x.category)}</div>", 'bestseller badge')
+          rep("<div class=\"firmness\"><b>Жёсткость:</b><span>${safe(firm).replace(' / 2 сторона','<br>2 сторона')}</span></div>", "${firmBlock}", 'firmness card block')
+          rep("<div class=\"price\">${money(vv[0].price)}</div><a class=\"btn\"", "<div class=\"pricearea\"><div class=\"price\">${money(vv[0].price)}</div><div class=\"promo\"><b>Цена сентября</b><span>до 30 сентября</span></div></div><a class=\"btn\"", 'price promo markup')
+          rep(
+              "moveBefore(products,'Матрас Mega холкон TFK Gray Night','Матрас Mega холкон-кокос TFK Gray Night');[...new Set(products.map(x=>x.category))]",
+              "moveBefore(products,'Матрас Mega холкон TFK Gray Night','Матрас Mega холкон-кокос TFK Gray Night');moveAfter(products,'Наматрасник \\\"Непромокаемый чехол\\\"','Подушка Память форма');[...new Set(products.map(x=>x.category))]",
+              'accessory order'
+          )
+
           p.write_text(t, encoding='utf-8')
+      - name: Validate JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          t=Path('index.html').read_text(encoding='utf-8')
+          js=re.search(r'<script>(.*)</script>',t,re.S).group(1)
+          Path('/tmp/site.js').write_text(js,encoding='utf-8')
+          PY
+          node --check /tmp/site.js
       - name: Commit site update
         run: |
           git config user.name "github-actions[bot]"
@@ -53,6 +100,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes needed"
           else
-            git commit -m "Use red prices, softer green backgrounds and stacked firmness lines"
+            git commit -m "Improve contrast, bestseller badges and September price presentation"
             git push
           fi

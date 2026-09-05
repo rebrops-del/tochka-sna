@@ -1,0 +1,38 @@
+name: Fix hero image
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-hero-image.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Decode and verify hero image
+        shell: bash
+        run: |
+          set -euo pipefail
+          base64 -d assets/hero-consultant-mattress.b64 > assets/hero-consultant-mattress.webp
+          test -s assets/hero-consultant-mattress.webp
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('assets/hero-consultant-mattress.webp')
+          b=p.read_bytes()
+          assert b[:4] == b'RIFF', b[:12]
+          assert b[8:12] == b'WEBP', b[:12]
+          print('valid webp bytes:', len(b))
+          PY
+          git config user.name "rebrops-del"
+          git config user.email "rebrops@gmail.com"
+          git add assets/hero-consultant-mattress.webp
+          git rm assets/hero-consultant-mattress.b64
+          git rm .github/workflows/fix-hero-image.yml
+          git commit -m "Fix hero image asset"
+          git push origin HEAD:main

@@ -1,0 +1,58 @@
+name: Unify brand green
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  unify:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Unify green palette
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('<meta name="theme-color" content="#20bd66">','<meta name="theme-color" content="#0A8D55">')
+          marker = '/* unified-brand-green-v1 */'
+          css = '''
+/* unified-brand-green-v1 */
+:root{--brand-green:#0A8D55;--forest:#0A8D55;--green:#0A8D55;--green2:#0A8D55;--sage:#D8EEE3;--mint:#EFF8F4}
+.top{background:var(--brand-green)}
+.hero .eyebrow{background:var(--brand-green);color:#fff;box-shadow:0 10px 26px rgba(10,141,85,.18)}
+.hero .hero-primary{background:var(--brand-green);border-color:var(--brand-green);box-shadow:0 10px 24px rgba(10,141,85,.18)}
+.hero .hero-avito,.nav .btn.avito,.card .btn{color:var(--brand-green);border-color:var(--brand-green)}
+.hero .hero-avito:hover,.nav .btn.avito:hover,.card .btn:hover{color:var(--brand-green);border-color:var(--brand-green);background:#F5FBF8}
+.hero-adv-icon{color:var(--brand-green);background:rgba(10,141,85,.12)}
+.hero-note,.hero .hero-free,.d b,.step i,.selecttable th,.tag,.spec summary:after,.catalog-all{color:var(--brand-green)}
+.hero .hero-free:before{background:var(--brand-green)}
+.step i,.selecttable th,.tag{background:rgba(10,141,85,.10);border-color:rgba(10,141,85,.22)}
+input:focus,select:focus{border-color:var(--brand-green);box-shadow:0 0 0 3px rgba(10,141,85,.14)}
+.cta{background:var(--brand-green)}
+.deliverybox h2,.networkbox h2,.guidehead h2,.head h2,.fact b,.filterhint strong,.firmness b{color:var(--ink)}
+.hero .hero-free{background:linear-gradient(90deg,rgba(255,255,255,.90) 0%,rgba(255,255,255,.70) 58%,rgba(255,255,255,0) 100%)}
+'''
+          if marker not in s:
+              s = s.replace('</style>', css + '\n</style>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit palette update and remove task
+        shell: bash
+        run: |
+          rm -f .github/workflows/unify-brand-green.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html .github/workflows/unify-brand-green.yml
+          git commit -m "Unify site green palette"
+          git push

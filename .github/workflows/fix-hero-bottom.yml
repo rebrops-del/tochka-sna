@@ -1,45 +1,28 @@
-name: Fix hero image bottom edge
+name: Fix hero bottom
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - '.github/workflows/fix-hero-bottom.yml'
+      - .github/workflows/fix-hero-bottom.yml
 
 permissions:
   contents: write
 
 jobs:
   fix:
-    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Crop bottom artifact inside rounded hero
+      - name: Apply CSS crop
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('index.html')
-          s = p.read_text(encoding='utf-8')
-          marker = '/* hero-bottom-crop-v1 */'
-          css = '''\n\n/* hero-bottom-crop-v1 */
-.hero-visual{overflow:hidden}
-.hero-visual img{transform:scale(1.04);transform-origin:50% 0;will-change:transform}
-@media(max-width:620px){.hero-visual img{transform:scale(1.045)}}
-'''
-          if marker not in s:
-              pos = s.rfind('</style>')
-              if pos < 0:
-                  raise SystemExit('style tag not found')
-              s = s[:pos] + css + s[pos:]
-              p.write_text(s, encoding='utf-8')
-          PY
+          python3 -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(encoding='utf-8'); m='/* hero-bottom-crop-v1 */'; css='\\n\\n'+m+'\\n.hero-visual{overflow:hidden}\\n.hero-visual img{transform:scale(1.04);transform-origin:50% 0;will-change:transform}\\n'; p.write_text(s if m in s else s.rsplit('</style>',1)[0]+css+'</style>'+s.rsplit('</style>',1)[1],encoding='utf-8')"
           rm -f .github/workflows/fix-hero-bottom.yml
-      - name: Commit fix
+      - name: Commit
         run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add index.html .github/workflows/fix-hero-bottom.yml
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Remove white strip from hero image bottom'
+          git commit -m "Remove white strip from hero image bottom"
           git push

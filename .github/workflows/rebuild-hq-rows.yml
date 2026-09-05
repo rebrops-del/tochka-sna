@@ -1,0 +1,58 @@
+name: Rebuild HQ product rows
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: python -m pip install --quiet Pillow
+      - name: Build 5 HQ row images from individual product photos
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          src = Path('images/products')
+          out = Path('assets')
+          out.mkdir(exist_ok=True)
+          cell = (1200, 900)
+
+          for row in range(5):
+              canvas = Image.new('RGB', (cell[0] * 5, cell[1]), 'white')
+              for col in range(5):
+                  n = row * 5 + col + 1
+                  p = src / f'p{n:02d}.webp'
+                  if not p.exists():
+                      raise SystemExit(f'Missing {p}')
+                  im = Image.open(p).convert('RGB')
+                  if im.size != cell:
+                      im.thumbnail(cell, Image.Resampling.LANCZOS)
+                      tile = Image.new('RGB', cell, 'white')
+                      tile.paste(im, ((cell[0]-im.width)//2, (cell[1]-im.height)//2))
+                      im = tile
+                  canvas.paste(im, (col * cell[0], 0))
+              target = out / f'product-row-{row+1}.webp'
+              canvas.save(target, 'WEBP', quality=95, method=6)
+              print(target, target.stat().st_size)
+          PY
+      - name: Commit HQ row assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/product-row-1.webp assets/product-row-2.webp assets/product-row-3.webp assets/product-row-4.webp assets/product-row-5.webp
+          if git diff --cached --quiet; then
+            echo "HQ rows already current"
+            exit 0
+          fi
+          git commit -m "Build HQ product photo rows"
+          git push

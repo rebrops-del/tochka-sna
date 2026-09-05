@@ -1,0 +1,46 @@
+name: Crop only white strip from hero photo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/crop-hero-bottom.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  crop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+      - name: Crop only bottom white strip
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          img_path = Path('assets/hero-consultant-mattress.webp')
+          img = Image.open(img_path)
+          w, h = img.size
+          if h < 20:
+              raise SystemExit('hero image is unexpectedly small')
+          cropped = img.crop((0, 0, w, h - 13))
+          cropped.save(img_path, 'WEBP', quality=95, method=6)
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('hero-consultant-mattress.webp?v=20260905-hero-final',
+                        'hero-consultant-mattress.webp?v=20260905-hero-crop13')
+          p.write_text(s, encoding='utf-8')
+          PY
+          rm -f .github/workflows/crop-hero-bottom.yml
+      - name: Commit exact bottom crop
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/hero-consultant-mattress.webp index.html .github/workflows/crop-hero-bottom.yml
+          git commit -m 'Crop 13px white strip from hero photo'
+          git push

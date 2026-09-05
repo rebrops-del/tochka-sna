@@ -1,0 +1,36 @@
+name: Normalize hit ribbons
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-hit-ribbons.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Replace every hit category with the unified ribbon
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "const firm=getFirmness(x),hit=BESTSELLERS.has(x.model);"
+          new = "const firm=getFirmness(x),hit=BESTSELLERS.has(x.model)||/^хит(ы)? продаж$/i.test(String(x.category||'').trim());"
+          if old not in s:
+              raise SystemExit('Target line not found')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "rebrops-del"
+          git config user.email "rebrops@gmail.com"
+          git add index.html
+          git commit -m "Use the same bestseller ribbon for all hit cards"
+          git push

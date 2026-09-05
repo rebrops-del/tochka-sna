@@ -8,8 +8,11 @@
 <meta name="theme-color" content="#0A8D55">
 <style>
 :root{--ink:#193a2d;--mut:#64776e;--line:#dbe9e1;--bg:#f7faf8;--forest:#0d6545;--green:#31b875;--green2:#6bc997;--sage:#cfe8da;--mint:#eef8f3;--soft:#fbfdfc;--avito:#00aaff;--avito2:#008cff;--avitoSoft:#e9f8ff;--price:#e5323d;--priceDark:#b71f2b;--hit:#ef3340;--promo:#f5c542;--shadow:0 16px 42px rgba(23,95,66,.10)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Arial,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;font-family:Arial,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
 .wrap{width:min(1180px,calc(100% - 28px));margin:auto}
+#top,#catalog,#guide,#delivery,#about{scroll-margin-top:90px}
+@media(max-width:620px){html{scroll-padding-top:72px}#top,#catalog,#guide,#delivery,#about{scroll-margin-top:72px}}
+
 .top{background:#104b37;color:#eef8f2;font-size:13px}.top .wrap{min-height:38px;display:flex;align-items:center;justify-content:space-between;gap:18px}.top b{color:#fff}
 .nav{background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;backdrop-filter:blur(10px)}.navin{min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:20px}
 .brand{display:flex;align-items:center;gap:11px;text-decoration:none}.brandmark{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#1a8b5d,#65c592);position:relative;box-shadow:0 9px 22px rgba(24,75,59,.22)}.brandmark:before{content:"";position:absolute;width:18px;height:25px;border-radius:18px 18px 4px 18px;background:#dcefe2;left:11px;top:8px;transform:rotate(-18deg)}.brandmark:after{content:"";position:absolute;width:12px;height:3px;background:#fff34f;left:18px;top:24px;transform:rotate(-42deg);border-radius:2px}.brandtext{font-size:23px;font-weight:900;color:var(--forest);line-height:1}.brandtext span{color:var(--green)}.brandtext small{display:block;margin-top:5px;color:#7a8b82;font-size:10px;letter-spacing:.04em;text-transform:uppercase}

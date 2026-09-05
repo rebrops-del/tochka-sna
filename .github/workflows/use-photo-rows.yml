@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Switch catalog cards to row assets
+      - name: Switch catalog cards to row assets and sync CTA style
         shell: bash
         run: |
           python - <<'PY'
@@ -28,11 +28,21 @@ jobs:
           new_style='style="--col:${pp[0]};background-image:url(\'assets/product-row-${pp[1]+1}.webp?v=20260905-photos2\')"'
           if old_style in s:
               s=s.replace(old_style,new_style)
+
+          old_cta='''.cta .btn.avito{background:#fff!important;color:var(--brand-green)!important;border:2px solid #fff!important;box-shadow:none!important}
+          .cta .btn.avito:hover{background:#EFF8F4!important;color:var(--brand-green)!important;border-color:#EFF8F4!important;filter:none}'''
+          new_cta='''.cta .btn.avito{background:#fff!important;color:var(--brand-green)!important;border:1.5px solid var(--brand-green)!important;border-radius:999px!important;box-shadow:none!important;gap:13px!important;font-weight:900!important;filter:none!important;min-height:54px;padding:0 20px}
+          .cta .btn.avito::after{content:"";display:block;flex:0 0 18px;width:18px;height:18px;background:radial-gradient(circle at 4px 4px,#00aaff 0 3.8px,transparent 4.1px),radial-gradient(circle at 14px 4px,#ff4053 0 3.8px,transparent 4.1px),radial-gradient(circle at 4px 14px,#965eeb 0 3.8px,transparent 4.1px),radial-gradient(circle at 14px 14px,#04e061 0 3.8px,transparent 4.1px)}
+          .cta .btn.avito:hover{background:#F5FBF8!important;color:var(--brand-green)!important;border-color:var(--brand-green)!important;box-shadow:0 8px 20px rgba(10,141,85,.10)!important;filter:none!important}'''
+          if old_cta not in s:
+              raise SystemExit('CTA style marker not found')
+          s=s.replace(old_cta,new_cta,1)
+
           if 'product-row-${pp[1]+1}.webp' not in s:
               raise SystemExit('Photo row card marker not installed')
           p.write_text(s,encoding='utf-8')
           PY
-      - name: Verify assets
+      - name: Verify assets and CTA style
         run: |
           test -s assets/product-row-1.webp
           test -s assets/product-row-2.webp
@@ -40,7 +50,9 @@ jobs:
           test -s assets/product-row-4.webp
           test -s assets/product-row-5.webp
           grep -q 'product-row-${pp\[1\]+1}.webp' index.html
-      - name: Commit row asset switch
+          grep -q 'cta .btn.avito::after' index.html
+          grep -q 'border:1.5px solid var(--brand-green)' index.html
+      - name: Commit row assets and CTA style
         run: |
           if git diff --quiet; then
             echo "No changes"
@@ -49,5 +61,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Use valid product photo row assets"
+          git commit -m "Match lower Avito button to catalog cards"
           git push

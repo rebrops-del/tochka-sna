@@ -1,0 +1,45 @@
+name: Fix Avito wording
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-avito-wording.yml'
+      - 'index.html'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-wording:
+    if: github.event.head_commit.message != 'Use на Авито wording'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Update visible Avito wording
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          replacements = {
+              'Получить консультацию в Avito': 'Получить консультацию на Авито',
+              'Получить консультацию в Авито': 'Получить консультацию на Авито',
+              'Получить консультацию на Avito': 'Получить консультацию на Авито',
+              'Написать на Avito': 'Написать на Авито',
+          }
+          for old, new in replacements.items():
+              s = s.replace(old, new)
+          p.write_text(s, encoding='utf-8')
+          PY
+          rm -f .github/workflows/fix-avito-wording.yml
+      - name: Commit wording update
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/fix-avito-wording.yml
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Use на Авито wording'
+          git push

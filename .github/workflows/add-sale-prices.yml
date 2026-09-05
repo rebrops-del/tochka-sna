@@ -1,0 +1,70 @@
+name: Add professional sale price display
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-sale-prices.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add crossed original prices and 30 percent discount
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          old_css = ".pricearea{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:10px}.price{font-size:31px;line-height:1;font-weight:950;color:var(--price);text-shadow:none}.promo{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:0 0 auto}.promo b{font-size:11px;line-height:1;background:#fff5c9;color:#775800;border:1px solid #f0dc86;border-radius:999px;padding:6px 9px}.promo span{font-size:10px;color:#7d8b84;font-weight:700}"
+          new_css = ".pricearea{min-height:72px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}.price-stack{display:flex;flex-direction:column;gap:5px;min-width:0}.old-price-line{display:flex;align-items:center;gap:8px;min-height:22px}.old-price{font-size:15px;line-height:1;color:#8a9790;text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:#8a9790;font-weight:700;white-space:nowrap}.discount-badge{display:inline-flex;align-items:center;justify-content:center;min-height:22px;padding:0 8px;border-radius:999px;background:#fff0f1;color:#c82735;border:1px solid #f6cdd1;font-size:11px;font-weight:900;line-height:1;white-space:nowrap}.price{font-size:31px;line-height:1;font-weight:950;color:var(--price);text-shadow:none}.promo{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:0 0 auto;padding-bottom:2px}.promo b{font-size:11px;line-height:1;background:#fff5c9;color:#775800;border:1px solid #f0dc86;border-radius:999px;padding:6px 9px}.promo span{font-size:10px;color:#7d8b84;font-weight:700}"
+          if old_css not in s:
+              raise SystemExit('price CSS target not found')
+          s = s.replace(old_css, new_css, 1)
+
+          old_money = "const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';"
+          new_money = "const money=n=>new Intl.NumberFormat('ru-RU').format(n)+' ₽';\nconst oldPrice=n=>Math.round((Number(n)/0.7)/100)*100;"
+          if old_money not in s:
+              raise SystemExit('money helper target not found')
+          s = s.replace(old_money, new_money, 1)
+
+          old_markup = '<div class="pricearea"><div class="price">${money(vv[0].price)}</div><div class="promo"><b>Цена сентября</b><span>до 30 сентября</span></div></div>'
+          new_markup = '<div class="pricearea"><div class="price-stack"><div class="old-price-line"><span class="old-price">${money(oldPrice(vv[0].price))}</span><span class="discount-badge">−30%</span></div><div class="price">${money(vv[0].price)}</div></div><div class="promo"><b>Цена сентября</b><span>до 30 сентября</span></div></div>'
+          if old_markup not in s:
+              raise SystemExit('price markup target not found')
+          s = s.replace(old_markup, new_markup, 1)
+
+          old_event = "g.querySelectorAll('.size-select').forEach(sel=>sel.addEventListener('change',()=>{sel.closest('.cardbottom').querySelector('.price').textContent=money(+sel.value)}));"
+          new_event = "g.querySelectorAll('.size-select').forEach(sel=>sel.addEventListener('change',()=>{const bottom=sel.closest('.cardbottom'),price=+sel.value;bottom.querySelector('.price').textContent=money(price);bottom.querySelector('.old-price').textContent=money(oldPrice(price))}));"
+          if old_event not in s:
+              raise SystemExit('price change handler target not found')
+          s = s.replace(old_event, new_event, 1)
+
+          mobile_css = "\n@media(max-width:420px){.pricearea{align-items:flex-start;flex-direction:column;gap:9px}.promo{align-items:flex-start;padding-bottom:0}}\n"
+          style_end = s.rfind('</style>')
+          if style_end < 0:
+              raise SystemExit('style closing tag not found')
+          s = s[:style_end] + mobile_css + s[style_end:]
+
+          # Guardrails: only display logic is changed; product JSON/data remains untouched.
+          required = ['oldPrice=n=>', 'class="old-price"', 'class="discount-badge">−30%', "querySelector('.old-price')"]
+          for marker in required:
+              if marker not in s:
+                  raise SystemExit('validation failed: '+marker)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+          rm -f .github/workflows/add-sale-prices.yml
+      - name: Commit sale price presentation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/add-sale-prices.yml
+          git commit -m 'Show original prices with 30 percent discount'
+          git push

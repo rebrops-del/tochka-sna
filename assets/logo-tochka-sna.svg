@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="250" height="50" viewBox="0 0 250 50" role="img" aria-labelledby="title desc">
+  <title id="title">Точка Сна</title>
+  <desc id="desc">Матрасы для комфортной жизни</desc>
+  <g fill="none" fill-rule="evenodd">
+    <text x="0" y="27" fill="#073f46" font-family="Arial, Segoe UI, sans-serif" font-size="27" font-weight="900" letter-spacing="0.2">ТОЧКА СНА</text>
+    <g transform="translate(210 6) rotate(-18 14 14)">
+      <path d="M4 23C5 11 12 3 26 2c1 13-5 22-18 25-2 0-4-1-4-4Z" fill="#0a9b58"/>
+      <path d="M7 23c5-7 10-12 17-16" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+    <text x="2" y="44" fill="#264f55" font-family="Arial, Segoe UI, sans-serif" font-size="8.5" font-weight="500" letter-spacing="0.15">МАТРАСЫ ДЛЯ КОМФОРТНОЙ ЖИЗНИ</text>
+  </g>
+</svg>
